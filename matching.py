@@ -1,3 +1,4 @@
+import yaml
 from itertools import combinations
 
 def interest_score(a,b):
@@ -127,24 +128,24 @@ def match_peeps(data, groups):
     return match_map
 
 if __name__ == "__main__":
-    # Example data
-    data = {
-        "Bob": (1, 2),
-        "Alice": (2, 3),
-        "Charlie": (3, 4),
-        "David": (4, 5),
-        "Eve": (5, 1),
-        "Frank": (1, 5)
-    }
-    # Group assignments
-    groups = {
-        "Bob": "A",
-        "Alice": "A",
-        "Charlie": "B",
-        "David": "A",
-        "Eve": "C",
-        "Frank": "C"
-    }
+    # Load the data from the YAML files
+    with open("data.yaml", 'r') as f:
+        data = yaml.safe_load(f)
+    with open("groups.yaml", 'r') as f:
+        groups = yaml.safe_load(f)
+        
+    # Print the total amount of people
+    print("Total people:", len(data))
+    
 
     matches = match_peeps(data, groups)
-    print("Matches:", matches)
+    # Remove the duplicates, so if X is matched to Y, don't also show Y matched to X
+    unique_matches = {}
+    for person, match in matches.items():
+        if match is None or (match, person) not in unique_matches.items():
+            unique_matches[person] = match
+    # Put the matches in a yaml file
+    with open("matches.yaml", 'w') as f:
+        yaml.dump(unique_matches, f)
+
+    print("Total matches made:", len([m for m in unique_matches.values() if m is not None]))
